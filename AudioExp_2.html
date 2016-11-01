@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+  <head>
+    <title>My experiment</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="C:\Users\kapha\Dropbox (Ancien)\Dropbox\Projects\jspsych-5.0.3\jspsych.js"></script>
+    <script src="C:\Users\kapha\Dropbox (Ancien)\Dropbox\Projects\jspsych-5.0.3\plugins\jspsych-text.js"></script>
+	<script src="C:\Users\kapha\Dropbox (Ancien)\Dropbox\Projects\jspsych-5.0.3\plugins\jspsych-single-stim.js"></script>
+	<script src="C:\Users\kapha\Dropbox (Ancien)\Dropbox\Projects\jspsych-5.0.3\plugins\jspsych-single-audio.js"></script>
+    <link href="C:\Users\kapha\Dropbox (Ancien)\Dropbox\Projects\jspsych-5.0.3\css\jspsych.css" rel="stylesheet" type="text/css"></link>
+  </head>
+  <body>
+  </body>
+  <script>
+  //define a welcome message block
+	
+	var hello_trial = {
+		type: "text",
+		text: 'Bonjour!!'
+	}
+		
+		
+	// define the instructions
+	var instructions_block = {
+		type: "text",
+		text: "<p> In this experiment, you will hear a sound and you will have to " +
+			  "of the screen.</p><p>If the circle is <strong>blue</strong>, " +
+			  "press the letter F on the keyboard as fast as you can.</p>" +
+			  "<p>If the circle is <strong>orange</strong>, do not press " +
+			  "any key.</p>" +
+			  "<div class='left center-content'><img src='img/blue.png'></img>" +
+			  "<p class='small'><strong>Press the F key</strong></p></div>" +
+			  "<div class='right center-content'><img src='img/orange.png'></img>" +
+			  "<p class='small'><strong>Do not press a key</strong></p></div>" +
+			  "<button> "click here " </button> <p>Press any key to begin.</p>",
+		timing_post_trial: 2000
+	};
+	
+	var categorization = {
+		type: 'single-audio',
+		stimulus: 'tests%26examples/sound/sound.mp3'
+		timing_response: -1,
+		choices: ["a", "b"],
+	}	
+	
+	//define the test block
+	var test_stimuli = [
+		{stimulus: 'C:\Users\kapha\Dropbox (Ancien)\Dropbox\Projects\jspsych-5.0.3\audio\123.mp3', data:{ response:'go' }},
+		{stimulus: 'audio/456.mp3', data:{ response: 'no-go' }}
+	];
+	
+	
+	
+	
+	var all_trials = jsPsych.randomization.repeat(test_stimuli, 10);
+	
+	var post_trial_gap = function() {
+		return Math.floor( Math.random() * 1500 ) + 750;
+	}
+	
+	
+	
+	var test_block = {
+		type:"single-audio",
+		choices:["F"],
+		timing_response: 1500,
+		timing_post_trial: post_trial_gap,
+		on_finish: function(data){
+			var correct = false;
+			if(data.response == 'go' && data.rt > -1){
+			  correct = true;
+			} else if(data.response == 'no-go' && data.rt == -1){
+			  correct = true;
+			}
+			jsPsych.data.addDataToLastTrial({correct: correct});
+		 },
+		timeline: all_trials
+	};
+	
+	//define debrief block
+	function getSubjectData(){
+		var trials = jsPsych.data.getTrialsOfType('single-audio');
+		var sum_rt = 0;
+		var correct_trial_count = 0;
+		var correct_rt_count = 0;
+		for (var i = 0; i < trials.length; i++) {
+			if (trials[i].correct ==true){
+				correct_trial_count++;
+				if(trials[i].rt > -1) {
+					sum_rt += trials[i].rt;
+					correct_rt_count++;
+				}
+			}
+		}
+		return {
+			rt: Math.floor(sum_rt / correct_rt_count),
+			accuracy: Math.floor(correct_trial_count / trials.length * 100)
+		}
+	}
+	
+	var debrief_block = {
+		 type: "text",
+		 text: function() {
+			var subject_data = getSubjectData();
+			return "<p>You responded correctly on "+subject_data.accuracy+"% of "+
+			"the trials.</p><p>Your average response time was <strong>" +
+			subject_data.rt + "ms</strong>. Press any key to complete the "+
+			"experiment. Thank you!</p>";
+		 }
+	};
+	
+	// starts an array containing all event of the timeline
+	var timeline = [];
+		timeline.push(welcome_block);
+		timeline.push(instructions_block);
+		timeline.push(test_block);
+		timeline.push(debrief_block);
+		
+	//start the experiment
+    jsPsych.init({
+		timeline: timeline,
+		on_finish: function() {
+			jsPsych.data.dysplayData();
+		},
+       	show_progress_bar: true
+    });
+	
+	</script>
+</html>
