@@ -13,40 +13,44 @@
   Experimentation not working...
   </body>
   <script>
+  
   //define a welcome message block
 	
-	var hello_trial = {
+	var welcome_block = {
 		type: "text",
-		text: 'Bonjour!!'
+		text: 'Bonjour!! and blablabla'
 	}
 		
 		
 	// define the instructions
 	var instructions_block = {
 		type: "text",
-		text: "<p> In this experiment, you will hear a sound and you will have to " +
-			  "<button> "click here " </button> <p>Press any key to begin.</p>",
+		text: "<p> In this experiment, you will hear a sound and you will have to </p>",
 		timing_post_trial: 2000
 	};
-	
-  	
   
 	var categorization = {
 		type: 'single-audio',
-		stimulus: test_stimuli
 		timing_response: -1,
 		choices: ["a", "b"],
-	}	
+		prompt: "Type 'a' or 'b'",
+		on_finish: function(data){
+			var correct = false;
+			if(data.response == 'a' && data.rt > -1){
+			  correct = true;
+			} else if(data.response == 'b' && data.rt == -1){
+			  correct = true;
+			}
+			jsPsych.data.addDataToLastTrial({correct: correct});
+		 },
+		timeline: all_trials
+	}		
 	
 	//define the test block
 	var test_stimuli = [
-		{stimulus: 'C:\Users\kapha\Dropbox (Ancien)\Dropbox\Projects\jspsych-5.0.3\audio\123.mp3', data:{ response:'a' }},
-		{stimulus: 'audio/456.mp3', data:{ response: 'b' }}
+		{stimulus: 'audio/111.mp3', data:{ response: 'a'}},
+		{stimulus: 'audio/112.mp3', data:{ response: 'b' }}
 	];
-	
-		for (var i=0; )
-	
-	
 	
 	var all_trials = jsPsych.randomization.shuffle(test_stimuli);
 	
@@ -54,23 +58,6 @@
 		return Math.floor( Math.random() * 1500 ) + 750;
 	}
 			
-	var test_block = {
-		type:"single-audio",
-		choices:["a", "b"],
-		timing_response: 1500,
-		timing_post_trial: post_trial_gap,
-		on_finish: function(data){
-			var correct = false;
-			if(data.response == 'go' && data.rt > -1){
-			  correct = true;
-			} else if(data.response == 'no-go' && data.rt == -1){
-			  correct = true;
-			}
-			jsPsych.data.addDataToLastTrial({correct: correct});
-		 },
-		timeline: all_trials
-	};
-	
 	//define debrief block
 	function getSubjectData(){
 		var trials = jsPsych.data.getTrialsOfType('single-audio');
@@ -107,7 +94,7 @@
 	var timeline = [];
 		timeline.push(welcome_block);
 		timeline.push(instructions_block);
-		timeline.push(test_block);
+		timeline.push(categorization);
 		timeline.push(debrief_block);
 		
 	//start the experiment

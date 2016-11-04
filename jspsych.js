@@ -75,7 +75,7 @@ var jsPsych = (function() {
     DOM_target.addClass('jspsych-display-element');
 
     // create experiment timeline
-    timeline = new TimelineNode({
+      = new TimelineNode({
       timeline: opts.timeline
     });
 
