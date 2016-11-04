@@ -29,33 +29,34 @@
 		timing_post_trial: 2000
 	};
 	
+  	
+  
 	var categorization = {
 		type: 'single-audio',
-		stimulus: 'tests%26examples/sound/sound.mp3'
+		stimulus: test_stimuli
 		timing_response: -1,
 		choices: ["a", "b"],
 	}	
 	
 	//define the test block
 	var test_stimuli = [
-		{stimulus: 'C:\Users\kapha\Dropbox (Ancien)\Dropbox\Projects\jspsych-5.0.3\audio\123.mp3', data:{ response:'go' }},
-		{stimulus: 'audio/456.mp3', data:{ response: 'no-go' }}
+		{stimulus: 'C:\Users\kapha\Dropbox (Ancien)\Dropbox\Projects\jspsych-5.0.3\audio\123.mp3', data:{ response:'a' }},
+		{stimulus: 'audio/456.mp3', data:{ response: 'b' }}
 	];
 	
+		for (var i=0; )
 	
 	
 	
-	var all_trials = jsPsych.randomization.repeat(test_stimuli, 10);
+	var all_trials = jsPsych.randomization.shuffle(test_stimuli);
 	
 	var post_trial_gap = function() {
 		return Math.floor( Math.random() * 1500 ) + 750;
 	}
-	
-	
-	
+			
 	var test_block = {
 		type:"single-audio",
-		choices:["F"],
+		choices:["a", "b"],
 		timing_response: 1500,
 		timing_post_trial: post_trial_gap,
 		on_finish: function(data){

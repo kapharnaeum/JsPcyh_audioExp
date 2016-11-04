@@ -3,28 +3,37 @@
  * Josh de Leeuw
  *
  * plugin for playing an audio file and getting a keyboard response
- *
+ *+
+ * plugin for categorization trials with feedback
+ * 
  * documentation: docs.jspsych.org
  *
  **/
 
-jsPsych.plugins["single-audio"] = (function() {
+jsPsych.plugins["categorization_auditoryStim"] = (function() {
 
   var plugin = {};
 
   var context = new AudioContext();
 
-  jsPsych.pluginAPI.registerPreload('single-audio', 'stimulus', 'audio');
+  jsPsych.pluginAPI.registerPreload('categorization_auditoryStim', 'stimulus', 'audio');
 
   plugin.trial = function(display_element, trial) {
 
     // default parameters
     trial.choices = trial.choices || [];
     trial.response_ends_trial = (typeof trial.response_ends_trial === 'undefined') ? true : trial.response_ends_trial;
-    // timing parameters
-    trial.timing_response = trial.timing_response || -1; // if -1, then wait for response forever
+    trial.text_answer = (typeof trial.text_answer === 'undefined') ? "" : trial.text_answer;
+    trial.correct_text = (typeof trial.correct_text === 'undefined') ? "<p class='feedback'>Correct</p>" : trial.correct_text;
+    trial.incorrect_text = (typeof trial.incorrect_text === 'undefined') ? "<p class='feedback'>Incorrect</p>" : trial.incorrect_text;
+    trial.show_feedback_on_timeout = (typeof trial.show_feedback_on_timeout === 'undefined') ? false : trial.show_feedback_on_timeout;
+    trial.timeout_message = trial.timeout_message || "<p>Please respond faster.</p>";
     trial.prompt = (typeof trial.prompt === 'undefined') ? "" : trial.prompt;
 
+    // timing parameters
+    trial.timing_response = trial.timing_response || -1; // if -1, then wait for response forever
+    trial.timing_feedback_duration = trial.timing_feedback_duration || 2000;   
+    
     // if any trial variables are functions
     // this evaluates the function and replaces
     // it with the output of the function
@@ -69,6 +78,7 @@ jsPsych.plugins["single-audio"] = (function() {
       // gather the data to store for the trial
       var trial_data = {
         "rt": response.rt * 1000,
+        "correct": correct,
         "stimulus": trial.audio_path,
         "key_press": response.key
       };
@@ -93,6 +103,7 @@ jsPsych.plugins["single-audio"] = (function() {
       }
     };
 
+    
     // start the response listener
     var keyboardListener = jsPsych.pluginAPI.getKeyboardResponse({
       callback_function: after_response,
